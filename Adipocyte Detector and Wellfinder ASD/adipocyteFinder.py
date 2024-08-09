@@ -20,7 +20,7 @@ import csv
 
 
 #if running only a single image or directory of preselected images, just change the path within this script. otherwise keep commented-- will mess with pathing of the program!
-# path = "/Volumes/TOSHIBA EXT/Adipo, vibration in pt 1/Qualitative Data D0 to D26/"
+# path = "/Sample Images/"
 # os.chdir(path)
 # dirList = os.listdir(path)
 # myImages = []
@@ -164,7 +164,7 @@ def recordData(imgname, percent_cover, avgValue):
     well_num = int(imgname[bound1 +2 : bound2]) // 68 + 1
     abbr = str(imgname[0:6]) +' well #' + str(well_num)
     
-    with open('/Volumes/TOSHIBA EXT/area_data_spreadsheet.csv', 'a', newline='') as csvfile:
+    with open('area_data_spreadsheet.csv', 'a', newline='') as csvfile:
         mywriter = csv.writer(csvfile)
         mywriter.writerow([abbr, imgname, percent_cover, avgValue])
 
