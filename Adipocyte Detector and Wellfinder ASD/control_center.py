@@ -6,8 +6,8 @@ Created on Mon Jul  1 15:40:51 2024
 @author: ananyadalal
 """
 """Description: this program works with wellfinder and adipocyte finder and runs on a directory
-    to detect adipocytes and lipid droplets in clusters. 
-    through this, you can also run individual image analysis or find images using well finder
+    to detect adipocytes and lipid droplets in clusters. Change to your directory (path).
+    Through this, you can also run individual image analysis or find images using well finder
         
         """
 # imports
@@ -58,8 +58,8 @@ for well in all_regions:
     
     
     
-
-os.system('say "process complete open python"')
+#optional line-- detection takes a while especially for a library of images so you can get a reminder when processing is complete
+#os.system('say "process complete open python"')
 #show all the images that have been processed and verify them
 print("All processing complete! Displaying images for verification. Press c while viewing an image if detection is poor (image name will print in terminal), and press q to move to next image. ")    
 
@@ -78,35 +78,3 @@ for image in processedImages:
 
 finaltime = round(time.time() - start_time, 2)
 print('\n-----Total time:', finaltime, 'seconds-----\nProcess Complete -- Data exported to area data spreadsheet.csv and control_colors.csv')
-
-        
-        
-        
-        
-        
-        
-        
-    
-    
-    # original methos using background filter value to get data
-    # control_image = well[-1]
-    # mean = acf.find_average(control_image)
-    # #get rid of the control image's name 
-    # well.pop()
-    # #for every item in the list except the last one 
-    
-
-# # mynames.append('D4 2_Left Dish_TD1_p00_0_A01f00d4.TIF')
-# # for imgname in mynames: 
-# #     #going from TD images 
-# #     im, y_coord, x_coord = wf.approximate_area(imgname)
-# #     region_name = wf.find_regions(imgname, y_coord, x_coord) #if u already have individual images, region_name = name of image
-    
-# #     date = region_name[0:3]
-# #     avg_value = acf.control_data[date]
-    
-# #     cf.processimage(region_name, filter_val = avg_value + 35)
-    
-
-# # for imgname, percent_cover in stored_areadata:
-# #     cf.plot_data_area(imgname, percent_cover)
