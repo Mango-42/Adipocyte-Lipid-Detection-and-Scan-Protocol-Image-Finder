@@ -5,7 +5,10 @@ Created on Tue Jul 23 14:17:51 2024
 
 @author: ananyadalal
 """
-
+"""Description: these functions let you run 10X microscopy images for adipocyte detection. 
+Manipulation of the code in this file is only needed for detecting on a few pre-selected images, i.e., one folder
+To run an image, uncomment the pathing code right after imports and the run line at the end of this
+"""
 
 # imports: numpy and PIL for image loading, matplotlib for plotting, skimage for droplet detection. time and os for overarching program functionality 
 import numpy as np
@@ -20,9 +23,9 @@ import csv
 
 
 #if running only a single image or directory of preselected images, just change the path within this script. otherwise keep commented-- will mess with pathing of the program!
-# path = "/Sample Images/"
-# os.chdir(path)
-# dirList = os.listdir(path)
+#path = "/Sample Images/"
+#os.chdir(os.getcwd() + path)
+#dirList = os.listdir(os.getcwd())
 # myImages = []
 # #if running a directory of preselected images
 # for i in range(0, len(dirList)):
@@ -31,10 +34,10 @@ import csv
 #         myImages.append(file)
 
 def processImage(imageName):
-    """Desc: this function takes in a microscope scanned image (imageName) and highlights adipocytes and lipid droplets. Returns the image name and percent covered by adipocytes on the image -- imageName, percentCovered
-    Key arrays and operations:
-        
-    
+    """Desc: this function takes in a microscope scanned image (imageName) and highlights adipocytes and lipid droplets. 
+        Returns the image name and percent covered by adipocytes on the image -- imageName, percentCovered
+        Not all functions used within this are vectorized, but the high run time is mainly due to the blob finding functions on big arrays
+        anticipate that runtime for an image will take between 20-40 s depending on how much detection occurs
     """
     startRegionTime = time.time()
     print('\n-----Starting work on ', imageName,"-----")
@@ -75,7 +78,7 @@ def processImage(imageName):
         #copies these regions from the grayImage onto adipocytesImage
         adipocytesImage[y-r : y+r, x-r : x+r] = grayImage[y-r : y+r, x-r : x+r]
         
-    # if present, remove scale bar at this steo bc it will always gets detected (very bright..)
+    # if present, remove scale bar at this step because it will always gets detected (very bright..)
     # adipocytesImage[1450:1535, 0:500] = np.nan
     
     logThreshold = 10
@@ -102,30 +105,28 @@ def processImage(imageName):
     # plt.imshow(logImage, cmap = 'winter', alpha = 1)
     
     
-    # we're going to blur out logImage to find general adipocytes now, which should be brightly labeled by blob_log on logImage. first, we need to replace the np.nan values in the bg with 1 (low value), bc otherwise the blur function next won't work.
-    # VECTORIZE THIS FUNCTION 
+    # blur out logImage to find general adipocytes now, which should be brightly labeled by blob_log on logImage.
+    # replace the np.nan values in the bg with 1 (low value), bc otherwise the blur function next won't work.
     for j in range(0, 1536):
         for i in range (0, 2048):
             if logImage[j][i] != 100:
                 logImage[j][i] = 1
-    # blurImage is a numpy array with the scikit gaussian blur of logImage. you can adjust sigma to be higher if you're working with less dense droplet samples. you can experiment with this function on any random array to see what works best
+    # blurImage is a numpy array with the scikit gaussian blur of logImage. you can adjust sigma to be higher if you're working with less dense droplet samples. 
+    # you can experiment with this function on any random array to see what works best depending on your dataset
     blurImage = gaussian(logImage, sigma = 10)
     
     # iterate through the blurImage array -- if a pixel is greater than detectionVal, store it on the final array in the same place
-    # VECTORIZE THIS FUNCTION
-    #change detection val based on brightness of the image, IF NEEDED
-   
-    # if average_color < 115: detectionVal = 5
+    # change detection val based on brightness of the image. may need to be changed for a different microscope. 
     
     detectionVal = 20
     if average_color > 130: detectionVal = 25
     if average_color < 115: detectionVal = 10
     
-    
     #variables to measure percent covered
     numPix = 0
     totalPix = size_x * size_y
-    
+
+    #calculate percent covered
     for j in range(0, 1536):
         for i in range (0, 2048):
             if blurImage[j][i] > detectionVal:
@@ -159,6 +160,8 @@ def processImage(imageName):
 
 
 def recordData(imgname, percent_cover, avgValue):
+    """Desc: this function writes data from processImage() to a spreadsheet area_data_spreadsheet.csv. 
+    Stores file information (prefixes based on naming conventions), adipocytes area percent detected, and average greyscale val of the image """
     bound1 = imgname.find('1f')
     bound2 = imgname.find('d4')
     well_num = int(imgname[bound1 +2 : bound2]) // 68 + 1
